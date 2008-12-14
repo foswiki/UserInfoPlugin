@@ -19,7 +19,7 @@ package TWiki::Plugins::UserInfoPlugin;
 use strict;
 use vars qw( $VERSION $RELEASE $uipCore );
 
-$VERSION = '$Rev: 10521 $';
+$VERSION = '$Rev$';
 $RELEASE = '1.53';
 
 ###############################################################################
