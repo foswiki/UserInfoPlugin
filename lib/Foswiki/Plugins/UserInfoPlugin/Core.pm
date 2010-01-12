@@ -41,10 +41,7 @@ sub new {
   #writeDebug("building a new Core");
 
   # figure out where the sessions are
-  $this->{sessionDir} = 
-    $Foswiki::cfg{TempfileDir} ||
-    $Foswiki::cfg{Sessions}{Dir} ||
-    &Foswiki::Func::getDataDir() . "/.session"; 
+  $this->{sessionDir} = $Foswiki::cfg{WorkingDir};
   if (! -e $this->{sessionDir}) {
     $this->{sessionDir} = '/tmp';
   }
