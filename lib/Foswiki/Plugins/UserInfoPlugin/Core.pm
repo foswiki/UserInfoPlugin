@@ -50,7 +50,6 @@ sub new {
   }
   
   # init properties
-  $this->{isDakar} = (defined $Foswiki::RELEASE)?1:0;
   $this->{WikiGuest} = &Foswiki::Func::getDefaultUserName();
   $this->{WikiGuest} = &Foswiki::Func::userToWikiName($this->{WikiGuest}, 1);
   $this->{ignoreHosts} = 
@@ -345,7 +344,7 @@ sub getUsers {
   #writeDebug("called getUsers");
   return $this->{users} if defined $this->{users};
   
-  my $wikiUsersTopicname = ($this->{isDakar})?$Foswiki::cfg{UsersTopicName}:$Foswiki::wikiUsersTopicname;
+  my $wikiUsersTopicname = $Foswiki::cfg{UsersTopicName};
   my $mainWeb = &Foswiki::Func::getMainWebname();
 
   my (undef, $topicText) = &Foswiki::Func::readTopic($mainWeb, $wikiUsersTopicname);
@@ -387,11 +386,7 @@ sub getVisitors {
 
   # get the logfile mask
   my $logFileGlob;
-  if ($this->{isDakar}) {
-    $logFileGlob = $Foswiki::cfg{LogFileName};
-  } else {
-    $logFileGlob = $Foswiki::logFilename;
-  }
+  $logFileGlob = $Foswiki::cfg{LogFileName};
   $logFileGlob =~ s/%DATE%/*/go;
   
   # go through the logfiles and collect visitor data
@@ -438,6 +433,7 @@ sub getVisitors {
       $wikiName =~ s/^\s+//g;
       $wikiName =~ s/\s+$//g;
       next unless $wikiName;
+      # SMELL: RegistrationAgent, UknownUser, ProjectContributor, etc.
       next if $wikiName =~ /^TWiki/o; # exclude default user
 
       $wikiName =~ s/^.*?\.(.*)$/$1/g;

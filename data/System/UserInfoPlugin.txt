@@ -10,7 +10,7 @@
 -->
 ---+!! <nop>UserInfoPlugin
 %TOC%
-This plugin analyses the log files of your twiki-engine and extracts usefull
+This plugin analyses the session files of your wiki and extracts useful
 information to be displayed on your site. %BR%
 Warning: please respect the privacy of your users and don't display too much information.
 
@@ -46,7 +46,7 @@ The format parameter might containt the following variables:
 
 ---++ Plugin Settings
 
-	* Set SHORTDESCRIPTION = Render information about users on your <nop>TWikiSite
+	* Set SHORTDESCRIPTION = Render information about users on your wiki
 
 	* add a list of host addresses to ignore users comming from them
 		* Set IGNORE_HOSTS = 
@@ -55,17 +55,13 @@ The format parameter might containt the following variables:
 
 ---++ Plugin Installation Instructions
 
-This plugin has been tested on TWiki/Beijing, TWiki/Cairo and TWiki/Dakar.
-If you are installing it on TWiki/Cairo you need the Foswiki:Extensions/SessionPlugin.
-TWiki/Dakar has build-in support for cgi sessions.
-	
 	* Download the ZIP file from the Plugin web (see below)
-	* Unzip ==%TOPIC%.zip== in your twiki installation directory. Content:
+	* Unzip ==%TOPIC%.zip== in your foswiki installation directory. Content:
 	  | *File:* | *Description:* |
 	  | ==data/System/%TOPIC%.txt== | Plugin topic |
 	  | ==lib/Foswiki/Plugins/%TOPIC%.pm== | Plugin Perl module |
 	  | ==lib/Foswiki/Plugins/%TOPIC%/Core.pm== | Plugin Perl module |
-	* (Dakar) Visit =configure= in your TWiki installation, and enable the plugin in the {Plugins} section.
+	* (Dakar) Visit =configure= in your Foswiki installation, and enable the plugin in the {Plugins} section.
 
 ---++ Test
 If the plugin is installed correctly then you should get valid output for the tags below:%BR%
@@ -91,12 +87,13 @@ Recently registered users: %BR%
 
 ---++ Plugin Info
 
-|  Plugin Author: | TWiki:Main/MichaelDaum |
+|  Plugin Author: | Foswiki:Main/MichaelDaum |
 |  Copyright &copy;: | 2005-2006, Michael Daum |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | v1.53 |
+|  Plugin Version: | v1.54 |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
-|  09 June 2006: | fixed duplicate users in LASTVISITORS; \
+|  12 Jan 2006: | ported to Foswiki (Foswiki:Main.WillNorris) | 
+|  09 Jun 2006: | fixed duplicate users in LASTVISITORS; \
                    use IGNORE_USERS in LASTVISITORS |
 |  27 May 2006: | fixed error computing the number of last visitors (TWiki:Main.DavidBright); \
                   exclude the <no>AdminGroup "user" from the statistics; \
@@ -114,13 +111,12 @@ Recently registered users: %BR%
 |  27 Apr 2005: | fixed getting guests + some minor glitches | 
 |  12 Apr 2005: | initial release |
 |  &nbsp; | fixed =sep= handling, fixed =$host= parsing |
-|  TWiki Dependency: | $TWiki::Plugins::VERSION 1.024 |
-|  CPAN Dependencies: | Time::Local |
-|  Other Dependencies: | (Foswiki:Extensions/SessionPlugin) |
+|  Foswiki Dependency: | $TWiki::Plugins::VERSION 1.1 |
+|  CPAN Dependencies: | CPAN:Time::Local |
 |  Perl Version: | 5.8 |
-|  Plugin Home: | Foswiki:Extensions/%TOPIC% |
-|  Feedback: | Foswiki:Extensions/%TOPIC%Dev |
+|  Plugin Home: | http://foswiki.org/Extensions/%TOPIC% |
+|  Support: | http://foswiki.org/Support/%TOPIC% |
 
 
--- TWiki:Main/MichaelDaum - 09 June 2006
+-- Foswiki:Main/MichaelDaum - 09 June 2006
 

@@ -20,16 +20,11 @@ use strict;
 use vars qw( $VERSION $RELEASE $uipCore );
 
 $VERSION = '$Rev$';
-$RELEASE = '1.53';
+$RELEASE = '1.54';
 
 ###############################################################################
 sub initPlugin {
   #($topic, $web, $user, $installWeb) = @_;
-
-  if ($Foswiki::Plugins::VERSION < 1) {
-    &Foswiki::Func::writeWarning ("Version mismatch between UserInfoPlugin and Plugins.pm");
-    return 0;
-  }
 
   $uipCore = undef;
   return 1;
