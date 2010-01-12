@@ -14,7 +14,7 @@
 # http://www.gnu.org/copyleft/gpl.html
 #
 
-package TWiki::Plugins::UserInfoPlugin::Core;
+package Foswiki::Plugins::UserInfoPlugin::Core;
 use strict;
 use vars qw($debug %MON2NUM);
 use Time::Local; # for timelocal
@@ -29,7 +29,7 @@ $debug = 0; # toggle me
 ###############################################################################
 # static
 sub writeDebug {
-  &TWiki::Func::writeDebug("- UserInfoPlugin - " . $_[0]) if $debug;
+  &Foswiki::Func::writeDebug("- UserInfoPlugin - " . $_[0]) if $debug;
 }
 
 
@@ -42,22 +42,22 @@ sub new {
 
   # figure out where the sessions are
   $this->{sessionDir} = 
-    $TWiki::cfg{TempfileDir} ||
-    $TWiki::cfg{Sessions}{Dir} ||
-    &TWiki::Func::getDataDir() . "/.session"; 
+    $Foswiki::cfg{TempfileDir} ||
+    $Foswiki::cfg{Sessions}{Dir} ||
+    &Foswiki::Func::getDataDir() . "/.session"; 
   if (! -e $this->{sessionDir}) {
     $this->{sessionDir} = '/tmp';
   }
   
   # init properties
-  $this->{isDakar} = (defined $TWiki::RELEASE)?1:0;
-  $this->{WikiGuest} = &TWiki::Func::getDefaultUserName();
-  $this->{WikiGuest} = &TWiki::Func::userToWikiName($this->{WikiGuest}, 1);
+  $this->{isDakar} = (defined $Foswiki::RELEASE)?1:0;
+  $this->{WikiGuest} = &Foswiki::Func::getDefaultUserName();
+  $this->{WikiGuest} = &Foswiki::Func::userToWikiName($this->{WikiGuest}, 1);
   $this->{ignoreHosts} = 
-    TWiki::Func::getPreferencesValue("USERINFOPLUGIN_IGNORE_HOSTS") || '';
+    Foswiki::Func::getPreferencesValue("USERINFOPLUGIN_IGNORE_HOSTS") || '';
   $this->{ignoreHosts} = join('|', split(/,\s?/, $this->{ignoreHosts}));
   my $usersString =
-    TWiki::Func::getPreferencesValue("USERINFOPLUGIN_IGNORE_USERS") || '';
+    Foswiki::Func::getPreferencesValue("USERINFOPLUGIN_IGNORE_USERS") || '';
   my @users;
   foreach my $user (split(/,\s?/, $usersString)) {
     if ($user =~ /^(.*)\.(.*?)$/) {
@@ -72,7 +72,7 @@ sub new {
     $this->{WikiGuest} .
     '|'.'AdminGroup' .
     '|'.'UnknownUser' .
-    '|'.$TWiki::cfg{Register}{RegistrationAgentWikiName} .
+    '|'.$Foswiki::cfg{Register}{RegistrationAgentWikiName} .
     '|'.'ProjectContributor';
 
   writeDebug("ignoreHosts=$this->{ignoreHosts}");
@@ -131,7 +131,7 @@ sub handleNrLastVisitors {
 
   $attributes = '' unless $attributes;
 
-  my $theDays = TWiki::Func::extractNameValuePair($attributes, "days") || 1;
+  my $theDays = Foswiki::Func::extractNameValuePair($attributes, "days") || 1;
   return $this->{nrLastVisitors}{$theDays} if defined $this->{nrLastVisitors}{$theDays};
 
   my $visitors = $this->getVisitors($theDays, undef, undef, $this->{ignoreUsers});
@@ -148,12 +148,12 @@ sub handleCurrentVisitors {
   writeDebug("called handleCurrentVisitors");
   $attributes = '' unless $attributes;
 
-  my $theHeader = &TWiki::Func::extractNameValuePair($attributes, "header") || '';
-  my $theFooter = &TWiki::Func::extractNameValuePair($attributes, "footer") || '';
-  my $theFormat = &TWiki::Func::extractNameValuePair($attributes, "format") ||
+  my $theHeader = &Foswiki::Func::extractNameValuePair($attributes, "header") || '';
+  my $theFooter = &Foswiki::Func::extractNameValuePair($attributes, "footer") || '';
+  my $theFormat = &Foswiki::Func::extractNameValuePair($attributes, "format") ||
     "\t* \$wikiusername";
-  my $theSep = &TWiki::Func::extractNameValuePair($attributes, "sep") || '$n';
-  my $theMax = &TWiki::Func::extractNameValuePair($attributes, "max") || 0;
+  my $theSep = &Foswiki::Func::extractNameValuePair($attributes, "sep") || '$n';
+  my $theMax = &Foswiki::Func::extractNameValuePair($attributes, "max") || 0;
   $theMax = 0 if $theMax eq "unlimited";
   
   # get current visitors
@@ -202,12 +202,12 @@ sub handleNewUsers {
   writeDebug("called handleNewUsers");
   $attributes = '' unless $attributes;
 
-  my $theHeader = &TWiki::Func::extractNameValuePair($attributes, "header") || '';
-  my $theFooter = &TWiki::Func::extractNameValuePair($attributes, "footer") || '';
-  my $theFormat = &TWiki::Func::extractNameValuePair($attributes, "format") ||
+  my $theHeader = &Foswiki::Func::extractNameValuePair($attributes, "header") || '';
+  my $theFooter = &Foswiki::Func::extractNameValuePair($attributes, "footer") || '';
+  my $theFormat = &Foswiki::Func::extractNameValuePair($attributes, "format") ||
     "\t* \$date - \$wikiusername";
-  my $theSep = &TWiki::Func::extractNameValuePair($attributes, "sep") || '$n';
-  my $theMax = &TWiki::Func::extractNameValuePair($attributes, "max") || 10;
+  my $theSep = &Foswiki::Func::extractNameValuePair($attributes, "sep") || '$n';
+  my $theMax = &Foswiki::Func::extractNameValuePair($attributes, "max") || 10;
   $theMax = 0 if $theMax eq "unlimited";
 
   my $users = $this->getUsers();
@@ -244,14 +244,14 @@ sub handleLastVisitors {
   writeDebug("called handleLastVisitors");
   $attributes = '' unless $attributes;
 
-  my $theHeader = &TWiki::Func::extractNameValuePair($attributes, "header") || '';
-  my $theFooter = &TWiki::Func::extractNameValuePair($attributes, "footer") || '';
-  my $theFormat = TWiki::Func::extractNameValuePair($attributes, "format" ) ||
+  my $theHeader = &Foswiki::Func::extractNameValuePair($attributes, "header") || '';
+  my $theFooter = &Foswiki::Func::extractNameValuePair($attributes, "footer") || '';
+  my $theFormat = Foswiki::Func::extractNameValuePair($attributes, "format" ) ||
     "\t* \$date - \$wikiusername";
-  my $theSep = TWiki::Func::extractNameValuePair($attributes, "sep" ) || '$n';
-  my $theMax = TWiki::Func::extractNameValuePair($attributes, "max") || 0;
+  my $theSep = Foswiki::Func::extractNameValuePair($attributes, "sep" ) || '$n';
+  my $theMax = Foswiki::Func::extractNameValuePair($attributes, "max") || 0;
   $theMax = 0 if $theMax eq 'unlimited';
-  my $theDays = TWiki::Func::extractNameValuePair($attributes, "days") || 1;
+  my $theDays = Foswiki::Func::extractNameValuePair($attributes, "days") || 1;
 
   my $visitors = $this->getVisitors($theDays, $theMax, undef, $this->{ignoreUsers});
 
@@ -304,7 +304,7 @@ sub getVisitorsFromSessionStore {
 
     #writeDebug("reading $sessionFile");
   
-    my $dump = &TWiki::Func::readFile($sessionFile);
+    my $dump = &Foswiki::Func::readFile($sessionFile);
     next unless $dump;
 
     my $wikiName = $this->{WikiGuest};
@@ -345,10 +345,10 @@ sub getUsers {
   #writeDebug("called getUsers");
   return $this->{users} if defined $this->{users};
   
-  my $wikiUsersTopicname = ($this->{isDakar})?$TWiki::cfg{UsersTopicName}:$TWiki::wikiUsersTopicname;
-  my $mainWeb = &TWiki::Func::getMainWebname();
+  my $wikiUsersTopicname = ($this->{isDakar})?$Foswiki::cfg{UsersTopicName}:$Foswiki::wikiUsersTopicname;
+  my $mainWeb = &Foswiki::Func::getMainWebname();
 
-  my (undef, $topicText) = &TWiki::Func::readTopic($mainWeb, $wikiUsersTopicname);
+  my (undef, $topicText) = &Foswiki::Func::readTopic($mainWeb, $wikiUsersTopicname);
   my @users;
   foreach my $line ( split( /\n/, $topicText) ) {
     #writeDebug("line=$line");
@@ -383,14 +383,14 @@ sub getVisitors {
   #writeDebug("theMax=$theMax") if $theMax;
   #writeDebug("includeNames=$includeNames") if $includeNames;
   #writeDebug("excludeNames=$excludeNames") if $excludeNames;
-  my $mainWeb = &TWiki::Func::getMainWebname();
+  my $mainWeb = &Foswiki::Func::getMainWebname();
 
   # get the logfile mask
   my $logFileGlob;
   if ($this->{isDakar}) {
-    $logFileGlob = $TWiki::cfg{LogFileName};
+    $logFileGlob = $Foswiki::cfg{LogFileName};
   } else {
-    $logFileGlob = $TWiki::logFilename;
+    $logFileGlob = $Foswiki::logFilename;
   }
   $logFileGlob =~ s/%DATE%/*/go;
   
@@ -406,7 +406,7 @@ sub getVisitors {
     #writeDebug("reading $logFilename");
 
     # read one logfile
-    my $fileContents = TWiki::Func::readFile($logFilename);
+    my $fileContents = Foswiki::Func::readFile($logFilename);
     
     # analysis
     my $nrVisitors = 0;
@@ -447,7 +447,7 @@ sub getVisitors {
       next if $seen{"$wikiName"};
 
       # check back
-      next unless TWiki::Func::topicExists($mainWeb, $wikiName);
+      next unless Foswiki::Func::topicExists($mainWeb, $wikiName);
 
       # host
       my $host = $fields[6];
@@ -500,8 +500,8 @@ sub replaceVars {
 
   if (defined $data) {
     if (defined $data->{wikiname}) {
-      $data->{username} = &TWiki::Func::wikiToUserName($data->{wikiname});
-      $data->{wikiusername} = &TWiki::Func::userToWikiName($data->{wikiname});
+      $data->{username} = &Foswiki::Func::wikiToUserName($data->{wikiname});
+      $data->{wikiusername} = &Foswiki::Func::userToWikiName($data->{wikiname});
     }
 
     foreach my $key (keys %$data) {

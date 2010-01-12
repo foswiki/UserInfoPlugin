@@ -14,7 +14,7 @@
 # http://www.gnu.org/copyleft/gpl.html
 #
 
-package TWiki::Plugins::UserInfoPlugin;
+package Foswiki::Plugins::UserInfoPlugin;
 
 use strict;
 use vars qw( $VERSION $RELEASE $uipCore );
@@ -26,8 +26,8 @@ $RELEASE = '1.53';
 sub initPlugin {
   #($topic, $web, $user, $installWeb) = @_;
 
-  if ($TWiki::Plugins::VERSION < 1) {
-    &TWiki::Func::writeWarning ("Version mismatch between UserInfoPlugin and Plugins.pm");
+  if ($Foswiki::Plugins::VERSION < 1) {
+    &Foswiki::Func::writeWarning ("Version mismatch between UserInfoPlugin and Plugins.pm");
     return 0;
   }
 
@@ -45,10 +45,10 @@ sub commonTagsHandler {
 sub getCore {
   return $uipCore if $uipCore;
 
-  eval 'use TWiki::Plugins::UserInfoPlugin::Core;';
+  eval 'use Foswiki::Plugins::UserInfoPlugin::Core;';
   die $@ if $@;
 
-  $uipCore = new TWiki::Plugins::UserInfoPlugin::Core;
+  $uipCore = new Foswiki::Plugins::UserInfoPlugin::Core;
 
   return $uipCore;
 }
