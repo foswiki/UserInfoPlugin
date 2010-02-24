@@ -380,105 +380,134 @@ sub getVisitors {
   #writeDebug("includeNames=$includeNames") if $includeNames;
   #writeDebug("excludeNames=$excludeNames") if $excludeNames;
   my $mainWeb = &Foswiki::Func::getMainWebname();
-
-  # get the logfile mask
-  my $logFileGlob;
-  $logFileGlob = $Foswiki::cfg{LogFileName};
-  $logFileGlob =~ s/%DATE%/*/go;
-  
-  # go through the logfiles and collect visitor data
-  my $isDone = 0;
-  my $days = 0;
-  my $n = $theMax;
-  my $currentDate = '';
-  my @logFiles = reverse glob $logFileGlob;
   my @lastVisitors = ();
-  my %seen = ();
-  foreach my $logFilename (@logFiles) {
-    #writeDebug("reading $logFilename");
+  my %seen;
 
-    # read one logfile
-    my $fileContents = Foswiki::Func::readFile($logFilename);
+  if (defined &Foswiki::Func::eachEventSince) {
+      # Round "now" to today
+      my $then = (time() / (24 * 60 * 60)) * (24 * 60 * 60);
+      $then -= ($theDays * 24 * 60 * 60);
+      $then = int($then / (24 * 60 * 60)) * 24 * 60 * 60;
+      my $it = Foswiki::Func::eachEventSince($then);
+      while ($it->hasNext()) {
+          my $e = $it->next();
+
+          my $wikiName = Foswiki::Func::getWikiName($e->[1]);
+
+          # check back
+          next unless Foswiki::Func::topicExists($mainWeb, $wikiName);
+
+          # create visitor struct
+          my $visitor = {
+              'sdate'    => Foswiki::Time::formatTime($e->[0], 'iso'),
+              'date'     => $e->[0],
+              'wikiname' => $wikiName,
+              'time'     =>  Foswiki::Time::formatTime($e->[0], '$min:$sec'),
+              'topic'    => $e->[3],
+              'host'     => $e->[5],
+          };
+          # store
+          $seen{$wikiName} = $visitor;
+      }
+      @lastVisitors = values %seen;
+  } else {
+      # get the logfile mask
+      my $logFileGlob;
+      $logFileGlob = $Foswiki::cfg{LogFileName};
+      $logFileGlob =~ s/%DATE%/*/go;
+  
+      # go through the logfiles and collect visitor data
+      my $isDone = 0;
+      my $days = 0;
+      my $n = $theMax;
+      my $currentDate = '';
+      my @logFiles = reverse glob $logFileGlob;
+      foreach my $logFilename (@logFiles) {
+          #writeDebug("reading $logFilename");
+
+          # read one logfile
+          my $fileContents = Foswiki::Func::readFile($logFilename);
     
-    # analysis
-    my $nrVisitors = 0;
-    foreach my $line (reverse split(/\n/, $fileContents)) {
-      my @fields = split(/\|/, $line);
-      if (!$fields[2]) {
-	#writeDebug("Hm, line '$line' has no wikiName");
-	next;
+          # analysis
+          my $nrVisitors = 0;
+          foreach my $line (reverse split(/\n/, $fileContents)) {
+              my @fields = split(/\|/, $line);
+              if (!$fields[2]) {
+                  #writeDebug("Hm, line '$line' has no wikiName");
+                  next;
+              }
+
+              # date
+              my $date = substr($fields[1], 1, 11);
+              $date =~ s/^\s+//g;
+              $date =~ s/\s+$//g;
+              if ($currentDate ne $date) {
+                  $currentDate = $date;
+                  $days++;
+              }
+              #writeDebug("date=$date, currentDate=$currentDate, days=$days");
+
+              # termination criteria
+              if (--$n == 0 || ($theDays && $days > $theDays)) {
+                  $isDone = 1;
+                  last;
+              }
+
+              # wikiname
+              my $wikiName = $fields[2];
+              $wikiName =~ s/^\s+//g;
+              $wikiName =~ s/\s+$//g;
+              next unless $wikiName;
+              # SMELL: RegistrationAgent, UknownUser, ProjectContributor, etc.
+              next if $wikiName =~ /^TWiki/o; # exclude default user
+              
+              $wikiName =~ s/^.*?\.(.*)$/$1/g;
+              
+              next if $excludeNames && $wikiName =~ /$excludeNames/;
+              next if $includeNames && $wikiName !~ /$includeNames/;
+              next if $seen{"$wikiName"};
+              
+              # check back
+              next unless Foswiki::Func::topicExists($mainWeb, $wikiName);
+
+              # host
+              my $host = $fields[6];
+              $host =~ s/^\s+//g;
+              $host =~ s/\s+$//g;
+              next if $host =~ /$this->{ignoreHosts}/;
+
+              # topic
+              my $thisTopic = $fields[4];
+              $thisTopic =~ s/^\s+//g;
+              $thisTopic =~ s/\s+$//g;
+
+              # date, time
+              my $time = substr($fields[1], 15, 5);
+              my $timeMark = 
+                $days * 24 +
+                  substr($fields[1], 15, 2) * 60 + 
+                    substr($fields[1], 18, 2);
+
+              # create visitor struct
+              my $visitor = {
+                  'wikiname'=>$wikiName,
+                  'sdate'=>$date,
+                  'date'=>parseDate($date),
+                  'time'=>$time,
+                  'host'=>$host,
+                  'topic'=>$thisTopic,
+              };
+              #writeDebug("found visitor $wikiName in the logs");
+              
+              # store
+              push @lastVisitors, $visitor;
+              $seen{"$wikiName"} = 1;
+              $nrVisitors++;
+          }
+          #writeDebug("found $nrVisitors visitors in file $logFilename");
+          
+          last if $isDone;
       }
-
-      # date
-      my $date = substr($fields[1], 1, 11);
-      $date =~ s/^\s+//g;
-      $date =~ s/\s+$//g;
-      if ($currentDate ne $date) {
-	$currentDate = $date;
-	$days++;
-      }
-      #writeDebug("date=$date, currentDate=$currentDate, days=$days");
-
-      # termination criteria
-      if (--$n == 0 || ($theDays && $days > $theDays)) {
-	$isDone = 1;
-	last;
-      }
-
-      # wikiname
-      my $wikiName = $fields[2];
-      $wikiName =~ s/^\s+//g;
-      $wikiName =~ s/\s+$//g;
-      next unless $wikiName;
-      # SMELL: RegistrationAgent, UknownUser, ProjectContributor, etc.
-      next if $wikiName =~ /^TWiki/o; # exclude default user
-
-      $wikiName =~ s/^.*?\.(.*)$/$1/g;
-      
-      next if $excludeNames && $wikiName =~ /$excludeNames/;
-      next if $includeNames && $wikiName !~ /$includeNames/;
-      next if $seen{"$wikiName"};
-
-      # check back
-      next unless Foswiki::Func::topicExists($mainWeb, $wikiName);
-
-      # host
-      my $host = $fields[6];
-      $host =~ s/^\s+//g;
-      $host =~ s/\s+$//g;
-      next if $host =~ /$this->{ignoreHosts}/;
-
-      # topic
-      my $thisTopic = $fields[4];
-      $thisTopic =~ s/^\s+//g;
-      $thisTopic =~ s/\s+$//g;
-
-      # date, time
-      my $time = substr($fields[1], 15, 5);
-      my $timeMark = 
-	$days * 24 +
-	substr($fields[1], 15, 2) * 60 + 
-	substr($fields[1], 18, 2);
-
-      # create visitor struct
-      my $visitor = {
-	'wikiname'=>$wikiName,
-	'sdate'=>$date,
-	'date'=>parseDate($date),
-	'time'=>$time,
-	'host'=>$host,
-	'topic'=>$thisTopic,
-      };
-      #writeDebug("found visitor $wikiName in the logs");
-
-      # store
-      push @lastVisitors, $visitor;
-      $seen{"$wikiName"} = 1;
-      $nrVisitors++;
-    }
-    #writeDebug("found $nrVisitors visitors in file $logFilename");
-
-    last if $isDone;
   }
 
   return \@lastVisitors;

@@ -20,7 +20,7 @@ use strict;
 use vars qw( $VERSION $RELEASE $uipCore );
 
 $VERSION = '$Rev$';
-$RELEASE = '1.54';
+$RELEASE = '1.55';
 
 ###############################################################################
 sub initPlugin {

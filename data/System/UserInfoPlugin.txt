@@ -45,8 +45,9 @@ The format parameter might containt the following variables:
 | =$dollar= | dollar sign | %<nop>VISITORS%, %<nop>LASTVISITORS%, %<nop>NEWUSERS% |
 
 ---++ Plugin Settings
-
-	* Set SHORTDESCRIPTION = Render information about users on your wiki
+<!--
+	* Set SHORTDESCRIPTION = %$SHORTDESCRIPTION%
+-->
 
 	* add a list of host addresses to ignore users comming from them
 		* Set IGNORE_HOSTS = 
@@ -54,14 +55,7 @@ The format parameter might containt the following variables:
 		* Set IGNORE_USERS = %MAINWEB%.TestUser
 
 ---++ Plugin Installation Instructions
-
-	* Download the ZIP file from the Plugin web (see below)
-	* Unzip ==%TOPIC%.zip== in your foswiki installation directory. Content:
-	  | *File:* | *Description:* |
-	  | ==data/System/%TOPIC%.txt== | Plugin topic |
-	  | ==lib/Foswiki/Plugins/%TOPIC%.pm== | Plugin Perl module |
-	  | ==lib/Foswiki/Plugins/%TOPIC%/Core.pm== | Plugin Perl module |
-	* (Dakar) Visit =configure= in your Foswiki installation, and enable the plugin in the {Plugins} section.
+%$INSTALL_INSTRUCTIONS%
 
 ---++ Test
 If the plugin is installed correctly then you should get valid output for the tags below:%BR%
@@ -90,9 +84,11 @@ Recently registered users: %BR%
 |  Plugin Author: | Foswiki:Main/MichaelDaum |
 |  Copyright &copy;: | 2005-2006, Michael Daum |
 |  License: | GPL ([[http://www.gnu.org/copyleft/gpl.html][GNU General Public License]]) |
-|  Plugin Version: | v1.54 |
+|  Release: | %$RELEASE% |
+|  Version: | %$VERSION% |
 |  Change History: | <!-- versions below in reverse order -->&nbsp; |
-|  12 Jan 2006: | ported to Foswiki (Foswiki:Main.WillNorris) | 
+|  24 Feb 2010: | modified to use Foswiki 1.1 Func API |
+|  12 Jan 2009: | ported to Foswiki (Foswiki:Main.WillNorris) | 
 |  09 Jun 2006: | fixed duplicate users in LASTVISITORS; \
                    use IGNORE_USERS in LASTVISITORS |
 |  27 May 2006: | fixed error computing the number of last visitors (TWiki:Main.DavidBright); \
