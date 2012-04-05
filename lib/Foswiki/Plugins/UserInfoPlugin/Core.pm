@@ -97,7 +97,6 @@ sub handleNrVisitors {
   return $this->{nrVisitors} if defined $this->{nrVisitors};
 
   my ($visitors) = $this->getVisitorsFromSessionStore(undef, $this->{ignoreUsers});
-print STDERR "visitors=@$visitors\n";
   $this->{nrVisitors} = scalar @$visitors;
 
   writeDebug("got $this->{nrVisitors} nr visitors");
